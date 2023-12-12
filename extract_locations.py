@@ -1,6 +1,7 @@
 import time
 import random
 import pandas as pd
+import argparse
 
 # Import the library Selenium 
 from selenium import webdriver
@@ -11,9 +12,19 @@ from selenium.common.exceptions import NoSuchElementException
 from selenium.common.exceptions import StaleElementReferenceException
 from selenium.webdriver.common.keys import Keys
 
+description = "Extract locations from google maps. The expected usage is extracting " \
+              "results of a query 'some_location_type in some_settlement'. Results are " \
+              "saved to a .csv file."
+
+parser = argparse.ArgumentParser(description=description,
+                                 formatter_class=argparse.ArgumentDefaultsHelpFormatter)
+parser.add_argument("location", help="location type")
+parser.add_argument("settlement", help="settlement to search in")
+
+args = parser.parse_args()
+
 debug = False
-city = 'vilnius'
-save_to = './locations_' + city + '.csv'
+save_to = './' + args.location + '_' + args.settlement + '.csv'
 
 # Make browser open in background 
 options = webdriver.ChromeOptions() 
@@ -23,7 +34,7 @@ service = Service(executable_path = "C:/chromedriver-win64/chromedriver.exe")
 driver = webdriver.Chrome(service=service, options=options)
 
 # Obtain the Google Map URL 
-driver.get(f'https://www.google.com/maps/search/cafe+in+{city}/')
+driver.get(f'https://www.google.com/maps/search/{args.location}+in+{args.settlement}/')
 time.sleep(2)
 #button = driver.find_element(By.XPATH, '//div[@data-is-touch-wrapper = "true"]')
 elements = driver.find_elements(By.XPATH, '//div[@data-is-touch-wrapper = "true"]')
