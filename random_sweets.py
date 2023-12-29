@@ -22,12 +22,13 @@ def random_sweets(count: int = 1, seed = None):
             results.append(adjectives[adjective_index] + " " + common_nouns[noun_index])
     return results
     
-    
-first_sweets = random_sweets()
-print(first_sweets)
+if __name__ == '__main__':
+    first_sweets = random_sweets()
+    print(first_sweets)
 
-second_sweets = random_sweets(10, 42)
-print(second_sweets)
+    second_sweets = random_sweets(10, 42)
+    print(second_sweets)
 
-third_sweets = random_sweets(30, "Some special name")
-print(third_sweets)
+    third_sweets = random_sweets(30, "Some special name")
+    print(third_sweets)
+
