@@ -127,10 +127,10 @@ time.sleep(10)
 driver.quit()
 print(extracted)
 
-locations_dict = {'Name': extracted_names,
-                  'Address': extracted_address,
-                  'Latitude': extracted_latitudes,
-                  'Longitude': extracted_longitudes}
+locations_dict = {'name': extracted_names,
+                  'address': extracted_address,
+                  'latitude': extracted_latitudes,
+                  'longitude': extracted_longitudes}
 df = pd.DataFrame(data=locations_dict)
 df.to_csv(save_to)  
 
