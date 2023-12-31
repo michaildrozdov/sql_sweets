@@ -31,29 +31,39 @@ mydb = mysql.connector.connect(
       password=args.password,
       database="sweets_database"
     )
-mycursor = mydb.cursor(buffered=True)
-mycursor.execute("SHOW TABLES")
+mycursor = mydb.cursor()
+mycursor.execute("DROP TABLE IF EXISTS sweets")
+mycursor.execute("DROP TABLE IF EXISTS caffes")
 
-has_caffes_table = False
-for table in mycursor:
-    if table[0] == "caffes":
-        has_caffes_table = True
-        break
-if has_caffes_table:
-    print("Clearing the table")
-    
-    # Remove all explicitly, at least on MySQL Server 8.1 auto-increment index starts with 1
-    mycursor.execute("DELETE FROM caffes WHERE id > 0;")
-    mycursor.execute("ALTER TABLE caffes AUTO_INCREMENT=1;")
-else:
-    mycursor.execute("CREATE TABLE caffes ("
-                        "id INT NOT NULL AUTO_INCREMENT,"
-                        "name VARCHAR(255) CHARACTER SET utf8mb4,"
-                        "address VARCHAR(255) CHARACTER SET utf8mb4,"
-                        "latitude FLOAT(23),"
-                        "longitude FLOAT(23),"
-                        "PRIMARY KEY (id))")
-
+mycursor.execute("CREATE TABLE caffes ("
+                    "id INT NOT NULL AUTO_INCREMENT,"
+                    "name VARCHAR(255) CHARACTER SET utf8mb4,"
+                    "address VARCHAR(255) CHARACTER SET utf8mb4,"
+                    "latitude FLOAT(23),"
+                    "longitude FLOAT(23),"
+                    "PRIMARY KEY (id))")
+mycursor.execute("CREATE TABLE sweets ("
+                    "id INT NOT NULL AUTO_INCREMENT,"
+                    "caffe_id INT NOT NULL,"
+                    "original_id INT NOT NULL,"
+                    "name VARCHAR(255) CHARACTER SET utf8mb4,"
+                    "price FLOAT(23),"
+                    "serving FLOAT(23),"
+                    "plate_area FLOAT(23),"
+                    "sourcing VARCHAR(31) CHARACTER SET utf8mb4,"
+                    "started_producing INT,"
+                    "type VARCHAR(31) CHARACTER SET utf8mb4,"
+                    "with_brown_sugar TINYINT,"
+                    "with_nuts TINYINT,"
+                    "whole_weat_flour TINYINT,"
+                    "with_eggs TINYINT,"
+                    "with_icing TINYINT,"
+                    "lactose_free TINYINT,"
+                    "with_cocoa TINYINT,"
+                    "with_berries TINYINT,"
+                    "look_date DATE,"
+                    "PRIMARY KEY (id),"
+                    "FOREIGN KEY (caffe_id) REFERENCES caffes(id))")
 
 all_files_names = os.listdir(data_dir)
 data_frames = []          
@@ -87,3 +97,10 @@ mydb.close()
 engine = create_engine(f"mysql+mysqlconnector://{args.user}:{args.password}@localhost/sweets_database")
 print("Adding entries")
 all_caffes.to_sql('caffes', con=engine, if_exists='append', index=False)
+
+sweets_path = "./data_exported/sweets.csv"
+if os.path.exists(sweets_path):
+    sweets_df = pd.read_csv(sweets_path, index_col=0)
+    sweets_df.to_sql('sweets', con=engine, if_exists='append', index=False)
+else:
+    print(f"Cannot find sweets entries in {sweets_path}. The table will not be created.")
